@@ -10,6 +10,9 @@ import SwiftUI
 struct CheckDataView: View {
     @State private var toggleCard: Bool = false
     @State private var togglePamplete: Bool = false
+    
+    @State var sort = sortedTool.newest
+    private var dummyData = ["경희대학교", "한국항공산업", "카카오 엔터테인먼트", "한화 에어로 스페이스"]
     var body: some View {
         VStack {
             HStack {
@@ -42,10 +45,24 @@ struct CheckDataView: View {
                     }
                     .foregroundColor(togglePamplete ? .black : .gray)
                 Spacer()
-            }.padding()
+            }.font(.title)
+            .padding()
+            HStack {
+                Spacer()
+                Picker(sort.rawValue, selection: $sort) {
+                    ForEach(sortedTool.allCases, id: \.self) { value in
+                        Text(value.rawValue)
+                            .tag(value)
+                    }
+                }.colorMultiply(.black)
+                    .pickerStyle(.menu)
+            }.padding(.horizontal)
+            Divider().padding(.top)
             ScrollView {
                 VStack {
-                    
+                    ForEach(dummyData, id: \.self) { dummy in
+                        dataListCellView(companyName: dummy)
+                    }
                 }
             }
             Spacer()
