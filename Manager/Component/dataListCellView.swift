@@ -19,7 +19,7 @@ struct dataListCellView: View {
                     Text("명함")
                         .encapulate(color: Color("playgroundColor"), foregroundColor: .white)
                         .onTapGesture {
-                            calcDate(addedDate: Date())
+                            print("2312321")
                         }
                 } else {
                     Text("팜플렛")
@@ -27,7 +27,7 @@ struct dataListCellView: View {
                         .foregroundColor(Color("playgroundColor"))
                 }
                 Spacer()
-                Text("")
+                Text("\(addedDate.formatted())") // 추가된 날짜 백엔드에서 받아와서 오늘 날짜랑 계산해서 표기하기 (하루전 2일전..)
             }.padding()
             HStack {
                 Text(companyName)
@@ -41,7 +41,7 @@ struct dataListCellView: View {
             }.padding(.horizontal)
         }.padding()
     }
-    func calcDate(addedDate: Date){
+    func calcDate(addedDate: Date){ // 백엔드에서 받아오는 날짜로 대신
         var howFarDate = 0
         print(Date().hashValue)
         print(1234)
