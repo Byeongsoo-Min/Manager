@@ -90,6 +90,7 @@ struct HomeView: View {
         }
         .navigationBarBackButtonHidden()
     }
+    
     func pageView(_ page: Int) -> some View {
         ZStack {
             if page == 0 {
