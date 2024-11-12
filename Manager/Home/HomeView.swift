@@ -40,6 +40,17 @@ struct HomeView: View {
                                 Spacer()
                                 Spacer()
                                 Spacer()
+                                NavigationLink(destination: CameraView()) {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundColor(.black)
+                                        .overlay(
+                                            Text("새로운 명함/팜플렛 인식하기")
+                                                .foregroundColor(.white.opacity(0.8))
+                                        )
+                                }
+                                .frame(height: 56)
+                                .padding()
+
                             }
                         )
                 }
