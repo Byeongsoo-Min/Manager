@@ -11,7 +11,11 @@ import SwiftUI
 struct ManagerApp: App {
     var body: some Scene {
         WindowGroup {
-            FirstView()
+            if UserDefaultsManager().getManagerName() != "" {
+                TabBarView()
+            } else {
+                FirstView()
+            }
         }
     }
 }
