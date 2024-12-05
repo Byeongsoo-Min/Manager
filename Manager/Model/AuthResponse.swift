@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+struct AuthResponse : Codable {
+    var status: String
+    var message: String
+    var manager_name: String?
+    var member_id: Int?
+}
