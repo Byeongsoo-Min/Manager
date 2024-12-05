@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct CardResponse: Decodable {
+    let status: String?
+    let cardId: Int?
+    let message: String?
+}

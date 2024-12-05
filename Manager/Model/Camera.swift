@@ -96,7 +96,7 @@ class Camera: NSObject, ObservableObject {
         print("[Camera]: Photo's saved")
     }
     
-    /*서버로 사진 올리기*/
+    /*명함 OCR 템플릿 이용해서 응답 받기*/
     func uploadTemplatePhoto(imageData: Data) {
 //        let token = UserDefaultsManager.shared.getTokens()
         let requestID = UUID().uuidString
@@ -124,8 +124,12 @@ class Camera: NSObject, ObservableObject {
                 .responseDecodable(of: TemplateOCR.self, completionHandler: { response in
                     switch response.result {
                     case .success(let data):
-                        print("success", data.images?[0].nameCard?.result.name[0].text)
+                        let companyName = data.images?[0].nameCard?.result.name[0].text
+                        let companyNumber = data.images?[0].nameCard?.result.mobile[0].text
+                        
                         self.uploadTemplateResponse = data
+                        UserDefaultsManager.shared.saveCardInfos(companyName: companyName ?? "경희대학교", companyNumber: companyNumber ?? "010-1111-1111")
+                        self.uploadPhotoToSpring(imageData: imageData, templateResponse: data)
                     case .failure(let error):
                         print(error.responseCode)
                         print(error)
@@ -148,6 +152,39 @@ class Camera: NSObject, ObservableObject {
 //                print(error)
 //            }
 //        })
+    }
+    
+    //Member ID 저장해두고 가져다 써야함
+    func uploadPhotoToSpring(imageData: Data, templateResponse: TemplateOCR) {
+        let url = URL(string: "http://localhost:8080/api/v1/card/uploads")
+        let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+        let imageName = timestamp.description + "image"
+        guard let companyName = templateResponse.images?[0].nameCard?.result.company[0].text, let companyNumber = templateResponse.images?[0].nameCard?.result.mobile[0].text else {
+            return
+        }
+        let parameters: [String: Any] = [
+            "memberId" : 11,
+            "companyName": companyName,
+            "companyNumber": companyNumber,
+            "companyImageUrl": "www.naver.com"
+        ]
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(imageData, withName: "image", fileName: imageName, mimeType: "image/jpeg")
+            for (key, value) in parameters {
+                if let valueData = "\(value)".data(using: .utf8) {
+                    multipartFormData.append(valueData, withName: key)
+                }
+            }
+        },to: url!, method: .post)
+        .responseDecodable(of: CardResponse.self, completionHandler: { response in
+            switch response.result {
+            case .success(let response):
+                print(response)
+            case .failure(let error):
+                print(error.responseCode)
+                print(error)
+            }
+        })
     }
     
     /*서버에서 사진 돌려받기*/
@@ -190,13 +227,14 @@ extension Camera: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
+        UserDefaultsManager.shared.saveCardImages(imageData: imageData)
         self.recentImage = UIImage(data: imageData)
         print("uploadPhoto")
         self.uploadTemplatePhoto(imageData: imageData)
         self.savePhoto(imageData)
         
         print("[CameraModel]: Capture routine's done")
-        print(self.uploadTemplateResponse?.images)
+//        print(self.uploadTemplateResponse?.images)
         self.isCameraBusy = false
     }
 }
