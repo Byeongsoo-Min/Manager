@@ -10,19 +10,23 @@ import SwiftUI
 struct CardView: View { //명함일때
     @State var isShowing: Bool = false
     @ObservedObject var observable: HomeObservable
-    let image: UIImage?
-    
+    let pageIdx: Int
     var body: some View {
         Rectangle()
             .overlay {
                 ZStack{
-                    Image(uiImage: ((image ?? UIImage(named: "exampleCard"))! ))
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+                    if let uiImage = decodeBase64ToImage(base64String: observable.cardsList?[pageIdx].imageBase64){
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } else {
+                        Image("exampleCard")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
                     VStack(spacing: 0){
                         HStack(spacing: 0){
                             Spacer()
-                            
                             Button{
                                 isShowing.toggle()
                             } label: {
@@ -36,7 +40,7 @@ struct CardView: View { //명함일때
                         Spacer()
                         
                         HStack(spacing: 0){
-                            Text("카카오 엔터테인먼트") // 명함 회사
+                            Text("\(observable.cardsList?[pageIdx].companyName ?? "경희대학교")") // 명함 회사
                                 .font(.system(size: 24))
                                 .bold()
                                 .foregroundColor(.white)
@@ -44,7 +48,7 @@ struct CardView: View { //명함일때
                         }
                         .padding(.bottom, 8)
                         HStack(spacing: 0){
-                            Text("010-1111-1111") // 명함 전화번호
+                            Text("\(observable.cardsList?[pageIdx].companyNumber ?? "010-1111-1111")") // 명함 전화번호
                                 .font(.system(size: 17))
                                 .bold()
                                 .foregroundColor(.white)
@@ -57,6 +61,12 @@ struct CardView: View { //명함일때
             }
             .foregroundColor(Color("cardBackgroundColor"))
     }
+     func decodeBase64ToImage(base64String: String?) -> UIImage? {
+         guard let imageData = Data(base64Encoded: base64String!, options: .ignoreUnknownCharacters) else {
+             return nil
+         }
+         return UIImage(data: imageData)
+     }
 }
 
 //#Preview {
