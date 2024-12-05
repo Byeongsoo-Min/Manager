@@ -10,6 +10,8 @@ import SwiftUI
 struct SecondView: View {
     @State var name:String = ""
     @State var moveToNext:Bool = false
+    @ObservedObject var uservm = UserViewModel()
+    
     var body: some View {
         VStack {
             Text("매니절을 고용하세요.")
@@ -31,9 +33,10 @@ struct SecondView: View {
                 TextField("입력해주세요", text: $name)
                     .padding(.horizontal, 50)
             }
-            if(name != "") {
+            if(name.count > 2) {
                 Button {
                     moveToNext = true
+                    uservm.signUp(manager_name: self.name)
                 } label: {
                     RoundedRectangle(cornerRadius: 16)
                         .foregroundColor(.black)
