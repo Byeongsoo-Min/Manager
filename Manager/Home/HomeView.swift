@@ -66,6 +66,7 @@ struct HomeView: View {
                             Pager(page: self.page2,
                                   data: self.data,
                                   id: \.self) { pageNumber in
+                                let cardImages = UserDefaultsManager.shared.getAllCardImages()
                                 self.pageView(pageNumber)
                                     .onTapGesture {
                                         observable.pageNumber = pageNumber
@@ -104,47 +105,15 @@ struct HomeView: View {
     
     func pageView(_ page: Int) -> some View {
         ZStack {
-            if page == 0 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
+            Rectangle()
+                .overlay {
+                    if let images = UserDefaultsManager.shared.getAllCardImages(),
+                       images.indices.contains(page) {
+                        CardView(observable: observable, image: images[page])
+                    } else {
+                        CardView(observable: observable, image: UIImage(named: "exampleCard"))
                     }
-            }
-            
-            if page == 1 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
-                    }
-            }
-            
-            if page == 2 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
-                    }
-            }
-            
-            if page == 3 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
-                    }
-            }
-            
-            if page == 4 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
-                    }
-            }
-            
-            if page == 5 {
-                Rectangle()
-                    .overlay {
-                        CardView(observable: observable, page: page)
-                    }
-            }
+                }
         }
         .cornerRadius(16)
     }

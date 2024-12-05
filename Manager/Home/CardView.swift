@@ -10,13 +10,13 @@ import SwiftUI
 struct CardView: View { //명함일때
     @State var isShowing: Bool = false
     @ObservedObject var observable: HomeObservable
-    var page: Int
+    let image: UIImage?
     
     var body: some View {
         Rectangle()
             .overlay {
                 ZStack{
-                    Image("exampleCard")
+                    Image(uiImage: ((image ?? UIImage(named: "exampleCard"))! ))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                     VStack(spacing: 0){
@@ -59,6 +59,6 @@ struct CardView: View { //명함일때
     }
 }
 
-#Preview {
-    CardView(observable: HomeObservable(), page: 0)
-}
+//#Preview {
+//    CardView(observable: HomeObservable(), page: 0)
+//}
