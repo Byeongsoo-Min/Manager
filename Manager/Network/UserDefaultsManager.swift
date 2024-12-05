@@ -43,17 +43,22 @@ class UserDefaultsManager {
         print("UserDefaultsManager - setConstants() called")
         UserDefaults.standard.set(managerName, forKey: Constants.managerName.rawValue)
         UserDefaults.standard.set(memberId, forKey: Constants.memberId.rawValue)
-        // Card 저장 수 불러오기
+        
+        // Card 저장 수 초기화
         UserDefaults.standard.set(0, forKey: Constants.numOfStoredCompany.rawValue)
+        
         UserDefaults.standard.synchronize()
     }
     
     func saveCardImages(imageData: Data){
         print("UserDEfaultsManager - saveCardImage() called")
-        let cardIndex = UserDefaults.standard.stringArray(forKey: Constants.imageKeys.rawValue)?.count ?? 0
+        let cardIndex = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue) + 1
+        
         let imageKey = "imageKeyNum\(cardIndex)"
         
         UserDefaults.standard.set(imageData, forKey: imageKey)
+        UserDefaults.standard.set(cardIndex, forKey: Constants.numOfStoredCompany.rawValue)
+        
         var imageKeys = UserDefaults.standard.stringArray(forKey: Constants.imageKeys.rawValue)
         if var imageKeys = imageKeys {
             if !imageKeys.contains(imageKey){
@@ -71,12 +76,14 @@ class UserDefaultsManager {
     }
     
     func saveCardInfos(companyName: String, companyNumber: String){
-        var index = UserDefaults.standard.stringArray(forKey: companyName)?.count ?? 0
+        var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue) + 1
         let companyNameKey = "\(companyName)\(index)"
         let companyNumberKey = "\(companyNumber)\(index)"
         
         UserDefaults.standard.set(companyName, forKey: companyNameKey)
         UserDefaults.standard.set(companyNumber, forKey: companyNumberKey)
+        UserDefaults.standard.set(index, forKey: Constants.numOfStoredCompany.rawValue)
+        
         var companyNamesKey = UserDefaults.standard.stringArray(forKey: Constants.companyNames.rawValue)
         var companyNumbersKey = UserDefaults.standard.stringArray(forKey: Constants.companyNumbers.rawValue)
         if var companyNamesKey = companyNamesKey, var companyNumbersKey = companyNumbersKey {
@@ -182,5 +189,19 @@ class UserDefaultsManager {
             }
         }
         return infos
+    }
+    // 저장한 idx에 맞춰서 저장된 모든 카드 가져옴
+    func getAllStoredCard() -> [Card] {
+        var cardList: [Card] = []
+        if let companyNameKeys = UserDefaults.standard.stringArray(forKey: Constants.companyNames.rawValue), let companyNumberKeys = UserDefaults.standard.stringArray(forKey: Constants.companyNumbers.rawValue), let imageKeys = UserDefaults.standard.stringArray(forKey: Constants.imageKeys.rawValue) {
+            for idx in Array(0..<UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)) {
+                if let companyName = UserDefaults.standard.string(forKey: companyNameKeys[idx]), let companyNumber = UserDefaults.standard.string(forKey: companyNumberKeys[idx]), let image = UserDefaults.standard.data(forKey: imageKeys[idx]) {
+                    let base64Encode = image.base64EncodedString()
+                    let card = Card(companyName: companyName, companyNumber: companyNumber, imageBase64: base64Encode, cardId: idx)
+                    cardList.append(card)
+                }
+            }
+        }
+        return cardList
     }
 }
