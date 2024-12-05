@@ -66,7 +66,6 @@ struct HomeView: View {
                             Pager(page: self.page2,
                                   data: self.data,
                                   id: \.self) { pageNumber in
-                                let cardImages = UserDefaultsManager.shared.getAllCardImages()
                                 self.pageView(pageNumber)
                                     .onTapGesture {
                                         observable.pageNumber = pageNumber
@@ -107,11 +106,12 @@ struct HomeView: View {
         ZStack {
             Rectangle()
                 .overlay {
-                    if let images = UserDefaultsManager.shared.getAllCardImages(),
-                       images.indices.contains(page) {
-                        CardView(observable: observable, image: images[page])
-                    } else {
-                        CardView(observable: observable, image: UIImage(named: "exampleCard"))
+                    if let images = observable.cardsList {
+                        if images.indices.contains(page){
+                            CardView(observable: observable, pageIdx: page)
+                        } else {
+                            DummyCardView()
+                        }
                     }
                 }
         }
@@ -162,6 +162,6 @@ struct HomeView: View {
 
 
 
-#Preview {
-    HomeView()
-}
+//#Preview {
+//    HomeView()
+//}

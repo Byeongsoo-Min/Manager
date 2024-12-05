@@ -12,13 +12,12 @@ class HomeObservable: ObservableObject {
     
     @Published var pageNumber: Int?
     @Published var moveToPage: Bool?
-    @Published var companyInfos: [String:String]?
-    @Published var cardImagesWithKey: [String: UIImage]?
+    @Published var cardsList: [Card]?
     
     var onTouchAction: (() -> Void)!
     init() {
         self.onTouchAction = self.setAction
-        self.cardImagesWithKey = UserDefaultsManager.shared.getCardImagesWithKeys()
+        self.cardsList = UserDefaultsManager.shared.getAllStoredCard()
         
     }
     
@@ -33,9 +32,6 @@ class HomeObservable: ObservableObject {
     func setAction(){
         self.moveToPage?.toggle()
         
-    }
-    func setCards(cards: [Card]) {
-        self.cardList = cards
     }
     
 }
