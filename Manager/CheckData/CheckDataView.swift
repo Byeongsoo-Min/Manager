@@ -12,6 +12,7 @@ struct CheckDataView: View {
     @State private var togglePamplete: Bool = false
     
     @State var sort = sortedTool.newest
+    @StateObject var networking = CheckDataViewModel()
     private var dummyData = ["경희대학교", "한국항공산업", "카카오 엔터테인먼트", "한화 에어로 스페이스"]
     var body: some View {
         VStack {
@@ -60,14 +61,16 @@ struct CheckDataView: View {
             Divider().padding(.top)
             ScrollView {
                 VStack {
-                    ForEach(dummyData, id: \.self) { dummy in
-                        dataListCellView(companyName: dummy)
+                    ForEach(networking.cardList ?? [], id: \.cardId) { card in
+                        dataListCellView(card: card)
                     }
                 }
             }
             Spacer()
             
-        }
+        }.onAppear(perform: {
+            networking.alamofireNetworking()
+        })
     }
 }
 

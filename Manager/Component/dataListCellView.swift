@@ -12,6 +12,7 @@ struct dataListCellView: View {
     var companyName = "경희대학교" //더미데이터 수정 필요
     var hashtagArray = ["경기도", "용인", "컴퓨터공학과"] //더미데이터 수정 필요
     var addedDate = Date()
+    var card: Card = Card(companyName: "경희대학교", companyNumber: "010-2222-1234", imageBase64: "", cardId: 12)
     var body: some View {
         VStack {
             HStack {
@@ -30,7 +31,7 @@ struct dataListCellView: View {
                 Text("\(addedDate.formatted())") // 추가된 날짜 백엔드에서 받아와서 오늘 날짜랑 계산해서 표기하기 (하루전 2일전..)
             }.padding()
             HStack {
-                Text(companyName)
+                Text(card.companyName)
                 Spacer()
             } .padding(.horizontal)
             HStack {
