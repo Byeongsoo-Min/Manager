@@ -22,6 +22,7 @@ class Camera: NSObject, ObservableObject {
     
     let templateOCRAPIKEY = Storage().OCRTEMPLATEAPIKEY
     let basicOCRAPIKEY = Storage().OCRBASICAPIKEY
+    let baseURL = APIClient.BASE_URL
     
     // Template OCR 주소
     let templateOCRUrl = "https://awikwsm4xg.apigw.ntruss.com/custom/v1/35752/218024e307346066a6314dbb5eaff689b7b58258d9f52729e655e15203a204e6/document/name-card"
@@ -156,7 +157,7 @@ class Camera: NSObject, ObservableObject {
     
     //Member ID 저장해두고 가져다 써야함
     func uploadPhotoToSpring(imageData: Data, templateResponse: TemplateOCR) {
-        let url = URL(string: "http://localhost:8080/api/v1/card/uploads")
+        let url = URL(string: baseURL + "card/uploads")
         let timestamp = Int(Date().timeIntervalSince1970 * 1000)
         let imageName = timestamp.description + "image"
         guard let companyName = templateResponse.images?[0].nameCard?.result.company[0].text, let companyNumber = templateResponse.images?[0].nameCard?.result.mobile[0].text else {
