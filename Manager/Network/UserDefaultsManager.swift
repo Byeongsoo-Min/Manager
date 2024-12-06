@@ -20,6 +20,9 @@ class UserDefaultsManager {
         case companyNames = "companyNames"
         case companyNumbers = "companyNumbers"
         case numOfStoredCompany
+        case userChatHistory
+        case gptChatHistory
+        case numOfStoredChat
     }
     
     static let shared: UserDefaultsManager = {
@@ -46,6 +49,8 @@ class UserDefaultsManager {
         
         // Card 저장 수 초기화
         UserDefaults.standard.set(0, forKey: Constants.numOfStoredCompany.rawValue)
+        // Chat 저장 수 초기화
+        UserDefaults.standard.set(0, forKey: Constants.numOfStoredChat.rawValue)
         
         UserDefaults.standard.synchronize()
     }
@@ -86,27 +91,84 @@ class UserDefaultsManager {
         
         var companyNamesKey = UserDefaults.standard.stringArray(forKey: Constants.companyNames.rawValue)
         var companyNumbersKey = UserDefaults.standard.stringArray(forKey: Constants.companyNumbers.rawValue)
-        if var companyNamesKey = companyNamesKey, var companyNumbersKey = companyNumbersKey {
+        // companyNamesKey가 nil, 즉 처음 저장될때를 대비함
+        if var companyNamesKey = companyNamesKey {
             if !companyNamesKey.contains(companyNameKey){
+                // 처음 저장되는 것일 경우 (근데 터질 일이 없는 if 문임)
                 companyNamesKey.append(companyNameKey)
                 UserDefaults.standard.set(companyNamesKey, forKey: Constants.companyNames.rawValue)
-            } else {
-               var companyNames: [String] = []
-               companyNames.append(companyNameKey)
-                UserDefaults.standard.set(companyNames, forKey: Constants.companyNames.rawValue)
-           }
+                print("------------save Company Name----------",companyNamesKey)
+            }
+        } else {
+            // 처음 Key를 저장할때
+            var companyNames: [String] = []
+            companyNames.append(companyNameKey)
+             UserDefaults.standard.set(companyNames, forKey: Constants.companyNames.rawValue)
+            print("------------First Save Company Name----------",companyNames)
+        }
+        
+        if var companyNumbersKey = companyNumbersKey {
             if !companyNumbersKey.contains(companyNumberKey){
                 companyNumbersKey.append(companyNumberKey)
                 UserDefaults.standard.set(companyNumbersKey, forKey: Constants.companyNumbers.rawValue)
-            } else {
-                var companyNumbers: [String] = []
-                companyNumbers.append(companyNumberKey)
-                UserDefaults.standard.set(companyNumbers, forKey: Constants.companyNumbers.rawValue)
+                print("------------save Company Number----------",companyNumbersKey)
             }
+        } else {
+            var companyNumbers: [String] = []
+            companyNumbers.append(companyNumberKey)
+            UserDefaults.standard.set(companyNumbers, forKey: Constants.companyNumbers.rawValue)
+            print("------------First Save Company Number----------",companyNumbers)
         }
         UserDefaults.standard.synchronize()
     }
     
+    func saveUserChat(message: String) {
+        let index = UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue) + 1
+        let userChatKey = "userChat\(index)"
+        
+        UserDefaults.standard.set(message, forKey: userChatKey)
+        UserDefaults.standard.set(index, forKey: Constants.numOfStoredChat.rawValue)
+        
+        var userChatKeys = UserDefaults.standard.stringArray(forKey: Constants.userChatHistory.rawValue)
+        
+        if var userChatKeys = userChatKeys {
+            if !userChatKeys.contains(userChatKey) {
+                userChatKeys.append(userChatKey)
+                UserDefaults.standard.set(userChatKeys, forKey: Constants.userChatHistory.rawValue)
+                print("------------save User Chat----------",userChatKeys)
+            }
+        } else {
+            var userChats: [String] = []
+            userChats.append(userChatKey)
+            UserDefaults.standard.set(userChats, forKey: Constants.userChatHistory.rawValue)
+            print("------------First Save User Chat----------",userChats)
+        }
+        UserDefaults.standard.synchronize()
+    }
+    
+    func saveGptChats(message: String) {
+        let index = UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue) + 1
+        let gptChatKey = "gptChat\(index)"
+        
+        UserDefaults.standard.set(message, forKey: gptChatKey)
+        UserDefaults.standard.set(index, forKey: Constants.numOfStoredChat.rawValue)
+        
+        var gptChatKeys = UserDefaults.standard.stringArray(forKey: Constants.gptChatHistory.rawValue)
+        
+        if var gptChatKeys = gptChatKeys {
+            if !gptChatKeys.contains(gptChatKey) {
+                gptChatKeys.append(gptChatKey)
+                UserDefaults.standard.set(gptChatKeys, forKey: Constants.gptChatHistory.rawValue)
+                print("------------save Gpt Chat----------",gptChatKeys)
+            }
+        } else {
+            var gptChats: [String] = []
+            gptChats.append(gptChatKey)
+            UserDefaults.standard.set(gptChats, forKey: Constants.userChatHistory.rawValue)
+            print("------------First Save Gpt Chat----------",gptChats)
+        }
+        UserDefaults.standard.synchronize()
+    }
 // 토큰들 가져오기
     /*JWT 토큰 발급 받을 시 사용할 함수*/
 //    func getTokens()->TokenData{
