@@ -123,8 +123,8 @@ class UserDefaultsManager {
     }
     
     func saveUserChat(message: String) {
-        let index = UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue) + 1
-        let userChatKey = "userChat\(index)"
+        let index = UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue)
+        let userChatKey = "user\(index)"
         
         UserDefaults.standard.set(message, forKey: userChatKey)
         UserDefaults.standard.set(index, forKey: Constants.numOfStoredChat.rawValue)
@@ -148,7 +148,7 @@ class UserDefaultsManager {
     
     func saveGptChats(message: String) {
         let index = UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue) + 1
-        let gptChatKey = "gptChat\(index)"
+        let gptChatKey = "gpt\(index)"
         
         UserDefaults.standard.set(message, forKey: gptChatKey)
         UserDefaults.standard.set(index, forKey: Constants.numOfStoredChat.rawValue)
@@ -265,5 +265,19 @@ class UserDefaultsManager {
             }
         }
         return cardList
+    }
+    // 각 인덱스에 맞춰서 User, Gpt가 적혀있는 딕셔너리 반환
+    // Key: User\(idx), Gpt\(idx) / Value: Chatting 내용
+    func getAllChats() -> [String:String] {
+        var chatList: [String: String] = [:]
+        if let userChatKeys = UserDefaults.standard.stringArray(forKey: Constants.userChatHistory.rawValue), let gptChatKeys = UserDefaults.standard.stringArray(forKey: Constants.gptChatHistory.rawValue) {
+            for idx in Array(0..<UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue)) {
+                if let userChat = UserDefaults.standard.string(forKey: userChatKeys[idx]), let gptChat = UserDefaults.standard.string(forKey: gptChatKeys[idx]) {
+                    chatList["user\(idx)"] = userChat
+                    chatList["gpt\(idx)"] = gptChat
+                }
+            }
+        }
+        return chatList
     }
 }
