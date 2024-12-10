@@ -21,6 +21,10 @@ class HomeObservable: ObservableObject {
         
     }
     
+    func refreshCards() {
+        self.cardsList = UserDefaultsManager.shared.getAllStoredCard()
+    }
+    
     func moveToPage(id: Int) {
         var pageID = id
         //서버에서 아이디에 따라 api 요청 코드 필요

@@ -19,10 +19,11 @@ class UserDefaultsManager {
         case imageKeys = "imageKeys"
         case companyNames = "companyNames"
         case companyNumbers = "companyNumbers"
-        case numOfStoredCompany
+        case companyHastTags
         case userChatHistory
         case gptChatHistory
         case numOfStoredChat
+        case numOfStoredCompany
     }
     
     static let shared: UserDefaultsManager = {
@@ -81,13 +82,12 @@ class UserDefaultsManager {
     }
     
     func saveCardInfos(companyName: String, companyNumber: String){
-        var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue) + 1
+        var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
         let companyNameKey = "\(companyName)\(index)"
         let companyNumberKey = "\(companyNumber)\(index)"
         
         UserDefaults.standard.set(companyName, forKey: companyNameKey)
         UserDefaults.standard.set(companyNumber, forKey: companyNumberKey)
-        UserDefaults.standard.set(index, forKey: Constants.numOfStoredCompany.rawValue)
         
         var companyNamesKey = UserDefaults.standard.stringArray(forKey: Constants.companyNames.rawValue)
         var companyNumbersKey = UserDefaults.standard.stringArray(forKey: Constants.companyNumbers.rawValue)
@@ -118,6 +118,31 @@ class UserDefaultsManager {
             companyNumbers.append(companyNumberKey)
             UserDefaults.standard.set(companyNumbers, forKey: Constants.companyNumbers.rawValue)
             print("------------First Save Company Number----------",companyNumbers)
+        }
+        UserDefaults.standard.synchronize()
+    }
+    
+    func saveCompanyHashTags(messages: String) { // 기다려봐
+        var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
+        let companyHashTagKey = "hashTag\(index)"
+        
+        UserDefaults.standard.set(messages, forKey: companyHashTagKey)
+        
+        var hashTagKeys = UserDefaults.standard.stringArray(forKey: Constants.companyHastTags.rawValue)
+        
+        if var hashTagKeys = hashTagKeys {
+            if !hashTagKeys.contains(companyHashTagKey){
+                // 처음 저장되는 것일 경우 (근데 터질 일이 없는 if 문임)
+                hashTagKeys.append(companyHashTagKey)
+                UserDefaults.standard.set(hashTagKeys, forKey: Constants.companyHastTags.rawValue)
+                print("------------save hashTag ----------",hashTagKeys)
+            }
+        } else {
+            // 처음 Key를 저장할때
+            var hashTags: [String] = []
+            hashTags.append(companyHashTagKey)
+             UserDefaults.standard.set(hashTags, forKey: Constants.companyHastTags.rawValue)
+            print("------------First Save hashTag----------",hashTags)
         }
         UserDefaults.standard.synchronize()
     }
@@ -252,6 +277,20 @@ class UserDefaultsManager {
         }
         return infos
     }
+    
+    func getCompanyHashTags(idx: Int) -> String {
+        var hashTag = ""
+        if let hashTagKeys = UserDefaults.standard.stringArray(forKey: Constants.companyHastTags.rawValue) {
+            for hashTagKey in hashTagKeys {
+                if (hashTagKey == "hashTag\(idx)") {
+                    if let message = UserDefaults.standard.string(forKey: hashTagKey) {
+                        hashTag = message
+                    }
+                }
+            }
+        }
+        return hashTag
+    }
     // 저장한 idx에 맞춰서 저장된 모든 카드 가져옴
     func getAllStoredCard() -> [Card] {
         var cardList: [Card] = []
@@ -259,7 +298,7 @@ class UserDefaultsManager {
             for idx in Array(0..<UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)) {
                 if let companyName = UserDefaults.standard.string(forKey: companyNameKeys[idx]), let companyNumber = UserDefaults.standard.string(forKey: companyNumberKeys[idx]), let image = UserDefaults.standard.data(forKey: imageKeys[idx]) {
                     let base64Encode = image.base64EncodedString()
-                    let card = Card(companyName: companyName, companyNumber: companyNumber, imageBase64: base64Encode, cardId: idx)
+                    let card = Card(companyName: companyName, companyNumber: companyNumber, image: base64Encode, cardId: idx)
                     cardList.append(card)
                 }
             }
