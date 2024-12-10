@@ -15,7 +15,7 @@ struct CardView: View { //명함일때
         Rectangle()
             .overlay {
                 ZStack{
-                    if let uiImage = decodeBase64ToImage(base64String: observable.cardsList?[pageIdx].imageBase64){
+                    if let uiImage = decodeBase64ToImage(base64String: observable.cardsList?[pageIdx].image){
                         Image(uiImage: uiImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
