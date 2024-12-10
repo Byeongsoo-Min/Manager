@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CameraView: View {
     @ObservedObject var viewModel = CameraViewModel(isReturn: false)
+    @Binding var isPresented: Bool
     var body: some View {
         ZStack {
             viewModel.cameraPreview.ignoresSafeArea()
@@ -28,6 +29,13 @@ struct CameraView: View {
                               "bolt.fill" : "bolt")
                         .foregroundColor(viewModel.isFlashOn ? .yellow : .white)
                     }
+                    .padding(.horizontal, 30)
+                    Button(action: {
+                        self.isPresented = false
+                    }, label: {
+                        Image(systemName: "xmark.app.fill")
+                            .foregroundColor(.white)
+                    })
                     .padding(.horizontal, 30)
                 }
                 .font(.system(size:25))
@@ -87,6 +95,6 @@ struct CameraView: View {
     }
 }
 
-#Preview {
-    CameraView()
-}
+//#Preview {
+//    CameraView()
+//}

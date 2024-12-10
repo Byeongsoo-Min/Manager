@@ -40,12 +40,14 @@ struct HomeView: View {
                                 Spacer()
                                 Spacer()
                                 Spacer()
-                                NavigationLink(destination: CameraView()) {
+                                NavigationLink(destination: CardRegisterView()) {
                                     RoundedRectangle(cornerRadius: 10)
                                         .foregroundColor(.black)
                                         .overlay(
-                                            Text("새로운 명함/팜플렛 인식하기")
+                                            Text("새로운 명함 인식하기")
                                                 .foregroundColor(.white.opacity(0.8))
+                                                .font(.title2)
+                                                .fontWeight(.semibold)
                                         )
                                 }
                                 .frame(height: 56)
@@ -58,9 +60,9 @@ struct HomeView: View {
                         VStack(spacing: 31) {
                             HStack{
                                 Text("매니절")
-                                    .font(.headline)
+                                    .font(.largeTitle)
                                     .fontWeight(.bold)
-                                    .foregroundStyle(.black)
+                                    .foregroundColor(Color("playgroundColor"))
                                 Spacer()
                             }.padding(.horizontal)
                             Pager(page: self.page2,
@@ -100,6 +102,9 @@ struct HomeView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .onAppear(perform: {
+            observable.refreshCards()
+        })
     }
     
     func pageView(_ page: Int) -> some View {
@@ -162,6 +167,6 @@ struct HomeView: View {
 
 
 
-//#Preview {
-//    HomeView()
-//}
+#Preview {
+    HomeView()
+}
