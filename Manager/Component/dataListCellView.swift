@@ -12,7 +12,7 @@ struct dataListCellView: View {
     var companyName = "경희대학교" //더미데이터 수정 필요
     var hashtagArray = ["경기도", "용인", "컴퓨터공학과"] //더미데이터 수정 필요
     var addedDate = Date()
-    var card: Card = Card(companyName: "경희대학교", companyNumber: "010-2222-1234", imageBase64: "", cardId: 12)
+    var card: Card = Card(companyName: "경희대학교", companyNumber: "010-2222-1234", image: "", cardId: 12)
     var body: some View {
         VStack {
             HStack {
