@@ -164,7 +164,7 @@ class Camera: NSObject, ObservableObject {
             return
         }
         let parameters: [String: Any] = [
-            "memberId" : 11,
+            "memberId" : UserDefaultsManager.shared.getMemeberId(),
             "companyName": companyName,
             "companyNumber": companyNumber,
             "companyImageUrl": "www.naver.com"
