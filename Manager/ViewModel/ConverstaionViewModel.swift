@@ -19,6 +19,7 @@ class ConverstaionViewModel: ObservableObject {
     var BASE_URL = APIClient.BASE_URL
     var BASE_PARAMETERS = ChatRequestModel(model: "gpt-3.5-turbo", messages: [], member_id: UserDefaultsManager.shared.getMemeberId())
     
+    
     init() {
         self.chatList = UserDefaultsManager.shared.getAllChats()
         self.chatIdx = (chatList?.count ?? 0)/2
@@ -32,6 +33,43 @@ class ConverstaionViewModel: ObservableObject {
         self.chatList?["user\(self.chatIdx)"] = message
     }
     
+    
+    func sendRequest(message: String, completion: @escaping (Result<String, Error>) -> Void) {
+        // URL 설정 (실제 서버 엔드포인트로 변경 필요)
+        guard let url = URL(string: BASE_URL + "chatGpt/prompt") else {
+            print("Invalid URL")
+            return
+        }
+        self.setMessage(message: message)
+        // 페이로드 생성
+        let payload = ChatRequestModel(
+            model: self.BASE_PARAMETERS.model,
+            messages: self.BASE_PARAMETERS.messages,
+            member_id: self.BASE_PARAMETERS.member_id
+        )
+        
+        // Alamofire를 사용한 POST 요청
+        AF.request(url,
+                   method: .post,
+                   parameters: payload,
+                   encoder: JSONParameterEncoder.default)
+        .validate() // HTTP 상태 코드 200-299 검증
+        .responseDecodable(of: ChatResponse.self) { response in
+            switch response.result {
+            case .success(let chat):
+                self.chatList?["gpt\(self.chatIdx)"] = chat.content
+                UserDefaultsManager.shared.saveUserChat(message: self.chatList?["user\(self.chatIdx)"] ?? "")
+                UserDefaultsManager.shared.saveGptChats(message: chat.content)
+                completion(.success(chat.content))
+            case .failure(let error):
+                if let underlyingError = error.underlyingError {
+                    completion(.failure(underlyingError))
+                } else {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
     func sendUserchatToServer(message: String) {
         //MARK: URL생성, guard let으로 옵셔널 검사
         guard let sessionUrl = URL(string: BASE_URL + "chatGpt/prompt") else {
@@ -39,20 +77,23 @@ class ConverstaionViewModel: ObservableObject {
             return
         }
         self.setMessage(message: message)
-        let parameters: Parameters = [
-            "model": self.BASE_PARAMETERS.model,
-            "message": self.BASE_PARAMETERS.messages,
-            "memberId" : self.BASE_PARAMETERS.member_id
-            
-        ]
+        print(self.BASE_PARAMETERS.messages)
+        let encoder = JSONEncoder()
+        let messageData = try! encoder.encode(self.BASE_PARAMETERS.messages)
+        
         let headers: HTTPHeaders = [
-            HTTPHeader.contentType("application/json")
+            "Content-Type": "application/json"
+        ]
+        let parameters: [String: Any] = [
+            "model": self.BASE_PARAMETERS.model,
+            "messages": messageData,
+            "member_id": self.BASE_PARAMETERS.member_id
         ]
         //MARK: Request생성
         AF.request(sessionUrl,
                    method: .post, // HTTP메서드 설정
                    parameters: parameters, // 파라미터 설정
-                   encoding: URLEncoding.default,
+                   encoding: JSONEncoding.default,
                    headers: headers) // 헤더 설정
         //MARK: responseDecodable을 통해 UserDatas form으로 디코딩, response의 성공 여부에 따라 작업 분기
         .responseDecodable(of: [ChatResponse].self) { response in
@@ -70,3 +111,4 @@ class ConverstaionViewModel: ObservableObject {
         }
     }
 }
+
