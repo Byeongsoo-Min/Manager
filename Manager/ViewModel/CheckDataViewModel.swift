@@ -12,7 +12,7 @@ import UIKit
 struct Card: Codable {
     var companyName: String
     var companyNumber: String
-    var imageBase64: String
+    var image: String
     var cardId: Int
 }
 
@@ -22,6 +22,10 @@ class CheckDataViewModel: ObservableObject {
     @Published var ratingSort = SortBy.ratingASC
     var BASE_URL = APIClient.BASE_URL
     
+    func updateList(tempList: [Card]) {
+        self.cardList = tempList
+    }
+    
     func alamofireNetworking() {
         //MARK: URL생성, guard let으로 옵셔널 검사
         guard let sessionUrl = URL(string: BASE_URL + "card/retrieve") else {
@@ -29,7 +33,7 @@ class CheckDataViewModel: ObservableObject {
             return
         }
         let parameters: Parameters = [
-            "memberId" : 11
+            "memberId" : UserDefaultsManager.shared.getMemeberId()
         ]
         //MARK: Request생성
         AF.request(sessionUrl,
@@ -40,30 +44,16 @@ class CheckDataViewModel: ObservableObject {
         .responseDecodable(of: [Card].self) { response in
             switch response.result {
             case .success(let cards):
-                print("received Cards", cards)
+                var tempList: [Card] = []
                 cards.forEach { card in
-                    self.cardList?.append(card)
+                    tempList.append(card)
+                    print(card.companyName)
+                    self.updateList(tempList: tempList)
                 }
             case .failure(let error):
                 print(error)
             }
         }
-    }
-    
-    func alamofireFixtureDetail<T: Decodable>(url: String, itemId: Int) async throws -> T{
-        let sessionUrl = URL(string: url.appending("/\(itemId)"))
-        print("get fixture detail", sessionUrl)
-        //MARK: Request생성
-        
-        return try await AF.request(sessionUrl!,
-                   method: .get, // HTTP메서드 설정
-                   parameters: nil, // 파라미터 설정
-                   encoding: URLEncoding.default, // 인코딩 타입 설정
-                   headers: ["Content-Type":"application/json", "Accept":"application/json"]) // 헤더 설정
-//        .validate(statusCode: 200..<300) // 유효성 검사
-//        MARK: responseDecodable을 통해 UserDatas form으로 디코딩, response의 성공 여부에 따라 작업 분기
-        .serializingDecodable()
-        .value
     }
     
     // For convinience. Sort type.
