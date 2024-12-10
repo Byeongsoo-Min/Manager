@@ -16,13 +16,13 @@ struct CheckDataView: View {
     private var dummyData = ["경희대학교", "한국항공산업", "카카오 엔터테인먼트", "한화 에어로 스페이스"]
     var body: some View {
         VStack {
-            HStack {
+            HStack{
                 Text("매니절")
-                    .font(.headline)
+                    .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundStyle(.black)
+                    .foregroundColor(Color("playgroundColor"))
                 Spacer()
-            }.padding()
+            }.padding(.horizontal)
             HStack(spacing: 16) {
                 Text("전체")
                     .fontWeight(.bold)
@@ -63,6 +63,15 @@ struct CheckDataView: View {
                 VStack {
                     ForEach(networking.cardList ?? [], id: \.cardId) { card in
                         dataListCellView(card: card)
+                    }
+                    if let _ = networking.cardList {
+                        
+                    } else {
+                        Text("카드를 등록해주세요!")
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color("playgroundColor"))
+                            .padding()
                     }
                 }
             }
