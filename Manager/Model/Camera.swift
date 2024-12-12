@@ -228,7 +228,7 @@ extension Camera: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
-        UserDefaultsManager.shared.saveCardImages(imageData: imageData)
+        UserDefaultsManager.shared.saveCardImage(imageData: imageData)
         self.recentImage = UIImage(data: imageData)
         print("uploadPhoto")
         self.uploadTemplatePhoto(imageData: imageData)
