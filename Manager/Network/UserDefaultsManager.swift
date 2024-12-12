@@ -30,6 +30,12 @@ class UserDefaultsManager {
         return UserDefaultsManager()
     }()
     
+    struct CompanyInfo {
+        var image: UIImage
+        var companyNameNum: [String]
+        var companyHashTag: [String]
+    }
+    
     // 저장된 모든 데이터 지우기
     func clearAll(){
         print("UserDefaultsManager - clearAll() called")
@@ -56,11 +62,11 @@ class UserDefaultsManager {
         UserDefaults.standard.synchronize()
     }
     
-    func saveCardImages(imageData: Data){
+    func saveCardImage(imageData: Data){
         print("UserDEfaultsManager - saveCardImage() called")
-        let cardIndex = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue) + 1
+        let cardIndex = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
         
-        let imageKey = "imageKeyNum\(cardIndex)"
+        let imageKey = "image\(cardIndex)"
         
         UserDefaults.standard.set(imageData, forKey: imageKey)
         UserDefaults.standard.set(cardIndex, forKey: Constants.numOfStoredCompany.rawValue)
@@ -83,8 +89,8 @@ class UserDefaultsManager {
     
     func saveCardInfos(companyName: String, companyNumber: String){
         var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
-        let companyNameKey = "\(companyName)\(index)"
-        let companyNumberKey = "\(companyNumber)\(index)"
+        let companyNameKey = "companyName\(index)"
+        let companyNumberKey = "companyNumber\(index)"
         
         UserDefaults.standard.set(companyName, forKey: companyNameKey)
         UserDefaults.standard.set(companyNumber, forKey: companyNumberKey)
@@ -122,7 +128,7 @@ class UserDefaultsManager {
         UserDefaults.standard.synchronize()
     }
     
-    func saveCompanyHashTags(messages: String) { // 기다려봐
+    func saveCompanyHashTags(messages: String) {
         var index = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
         let companyHashTagKey = "hashTag\(index)"
         
@@ -144,6 +150,7 @@ class UserDefaultsManager {
              UserDefaults.standard.set(hashTags, forKey: Constants.companyHastTags.rawValue)
             print("------------First Save hashTag----------",hashTags)
         }
+        UserDefaults.standard.set(index + 1, forKey: Constants.numOfStoredCompany.rawValue)
         UserDefaults.standard.synchronize()
     }
     
@@ -189,18 +196,11 @@ class UserDefaultsManager {
         } else {
             var gptChats: [String] = []
             gptChats.append(gptChatKey)
-            UserDefaults.standard.set(gptChats, forKey: Constants.userChatHistory.rawValue)
+            UserDefaults.standard.set(gptChats, forKey: Constants.gptChatHistory.rawValue)
             print("------------First Save Gpt Chat----------",gptChats)
         }
         UserDefaults.standard.synchronize()
     }
-// 토큰들 가져오기
-    /*JWT 토큰 발급 받을 시 사용할 함수*/
-//    func getTokens()->TokenData{
-//        let accessToken = UserDefaults.standard.string(forKey: Key.accessToken.rawValue) ?? ""
-//        return TokenData(accessToken: accessToken)
-//    }
-    
     // ManagerName 받기
     func getManagerName()->String {
         let managerName = UserDefaults.standard.string(forKey: Constants.managerName.rawValue) ?? ""
@@ -252,7 +252,7 @@ class UserDefaultsManager {
                 }
             }
         }
-        return cardImage;
+        return cardImage
     }
     // 원하는 회사 정보 index를 통해서 받아오기
     func getCardCompanyInfoByIdx(idx: Int)->[String] {
@@ -277,19 +277,21 @@ class UserDefaultsManager {
         }
         return infos
     }
-    
-    func getCompanyHashTags(idx: Int) -> String {
-        var hashTag = ""
+    // 저장된 해쉬태그 불러오기
+    func getCompanyHashTags(idx: Int) -> [String] {
+        var hashTags: [String] = []
         if let hashTagKeys = UserDefaults.standard.stringArray(forKey: Constants.companyHastTags.rawValue) {
             for hashTagKey in hashTagKeys {
                 if (hashTagKey == "hashTag\(idx)") {
                     if let message = UserDefaults.standard.string(forKey: hashTagKey) {
-                        hashTag = message
+                        for hashTag in message.split(separator: " ") {
+                            hashTags.append(String(hashTag))
+                        }
                     }
                 }
             }
         }
-        return hashTag
+        return hashTags
     }
     // 저장한 idx에 맞춰서 저장된 모든 카드 가져옴
     func getAllStoredCard() -> [Card] {
@@ -310,6 +312,8 @@ class UserDefaultsManager {
     func getAllChats() -> [String:String] {
         var chatList: [String: String] = [:]
         if let userChatKeys = UserDefaults.standard.stringArray(forKey: Constants.userChatHistory.rawValue), let gptChatKeys = UserDefaults.standard.stringArray(forKey: Constants.gptChatHistory.rawValue) {
+            print(">>>>>>>>>>>>>USERCHATKEYS<<<<<<<<<<<<<<<<",userChatKeys)
+            print(">>>>>>>>>>>>>GPTCHATKEYS<<<<<<<<<<<<<<<<",gptChatKeys)
             for idx in Array(0..<UserDefaults.standard.integer(forKey: Constants.numOfStoredChat.rawValue)) {
                 if let userChat = UserDefaults.standard.string(forKey: userChatKeys[idx]), let gptChat = UserDefaults.standard.string(forKey: gptChatKeys[idx]) {
                     chatList["user\(idx)"] = userChat
@@ -318,5 +322,23 @@ class UserDefaultsManager {
             }
         }
         return chatList
+    }
+    
+    func getCompanyInfos(pageIdx: Int) -> CompanyInfo {
+        print(">>>>>>>>>>>>>>>>>>NumOfStoredCompany<<<<<<<<<<<<<<",UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue))
+        let companyNameNum: [String] = self.getCardCompanyInfoByIdx(idx: pageIdx)
+        let companyImage: UIImage = self.getCardImageByIdx(idx: pageIdx)
+        let companyHashTags: [String] = self.getCompanyHashTags(idx: pageIdx)
+        
+        return CompanyInfo(image: companyImage, companyNameNum: companyNameNum, companyHashTag: companyHashTags)
+    }
+    
+    func getAllCardsInfos() -> [CompanyInfo] {
+        var result: [CompanyInfo] = []
+        let numOfCards = UserDefaults.standard.integer(forKey: Constants.numOfStoredCompany.rawValue)
+        for idx in Array(0..<numOfCards) {
+            result.append(self.getCompanyInfos(pageIdx: idx))
+        }
+        return result
     }
 }
