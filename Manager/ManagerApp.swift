@@ -14,7 +14,7 @@ struct ManagerApp: App {
             if UserDefaultsManager().getManagerName() != "" {
                 TabBarView()
             } else {
-                FirstView()
+                OnboardingView()
             }
         }
     }

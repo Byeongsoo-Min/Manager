@@ -13,16 +13,38 @@ struct SecondView: View {
     @ObservedObject var uservm = UserViewModel()
     
     var body: some View {
-        VStack {
+        ScrollView {
+            HStack {
+                Text("매니절")
+                    .customFont(size: 40)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color("playgroundColor"))
+                Spacer()
+            }.padding(.horizontal)
+                .padding(.bottom)
+            HStack {
+                Text("완벽한 사회생활을 위한 개인 비서")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                Spacer()
+            }.padding(.horizontal)
+            HStack {
+                Text("매니절")
+                    .font(.largeTitle)
+                    .padding(.bottom, 50)
+                Spacer()
+            }.padding(.horizontal)
+            Image("manager")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 400, height: 250)
+                .padding(.bottom)
             Text("매니절을 고용하세요.")
                 .font(.title)
-                .padding(.bottom, 24)
+                .fontWeight(.semibold)
             Text("OCR로 손쉽게 정보를 입력하세요.\n정보는 당신의 매니절이 기억할게요.")
                 .font(.title3)
-                .padding(.bottom, 50)
-            Image(systemName: "person.bubble.fill")
-                .resizable()
-                .frame(width: 200, height: 200)
                 .padding(.bottom, 50)
             ZStack{
                 RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/, style: /*@START_MENU_TOKEN@*/.continuous/*@END_MENU_TOKEN@*/)
@@ -30,7 +52,7 @@ struct SecondView: View {
                      .padding(.horizontal, 24)
                      .frame(height: 56)
                      .foregroundColor(.white)
-                TextField("입력해주세요", text: $name)
+                TextField("입력해주세요 (3글자 이상)", text: $name)
                     .padding(.horizontal, 50)
             }
             if(name.count > 2) {
@@ -59,6 +81,14 @@ struct SecondView: View {
         }
         .padding()
         .navigationBarBackButtonHidden(true)
+        .onAppear(perform: {
+            for family in UIFont.familyNames {
+                print("Font family: \(family)")
+                for name in UIFont.fontNames(forFamilyName: family) {
+                    print("Font name: \(name)")
+                }
+            }
+        })
     }
 }
 
