@@ -27,12 +27,29 @@ class ConverstaionViewModel: ObservableObject {
     
     func setMessage(message: String) {
         var messages: [Message] = []
-        messages.append(Message(role: "system", content: "Store each business card that is provided along with its tags. For every subsequent query:- Analyze the query for relevant keywords or details. - Retrieve the most appropriate business card based on the matches between the query and stored information. - If there are multiple suitable cards, return the one that most closely matches. The user's response is divided into /. Answer in korean."))
+        messages.append(Message(role: "system", content: "Store each business card that is provided along with its tags. For every subsequent query:- Analyze the query for relevant keywords or details. - Retrieve the most appropriate business card based on the matches between the query and stored information. Respond only based on this data. Do not invent or create new information. When the user asks about a person, find the best match in the data and provide their details in Korean. The user's response is divided into #. Answer in korean."))
         messages.append(Message(role: "user", content: message))
         self.BASE_PARAMETERS.messages = messages
         self.chatList?["user\(self.chatIdx)"] = message
     }
     
+    func incluedeStoredCard() -> [Message] {
+        var messages: [Message] = []
+        let cardInfos = UserDefaultsManager.shared.getAllCardsInfos()
+        
+        //저장된 Card들 정보랑
+        for info in cardInfos {
+            var message = info.companyNameNum.joined(separator: "#")
+            message.append("#")
+            message.append(info.companyHashTag.joined(separator: "#"))
+            messages.append(Message(role: "user", content: message))
+        }
+        for message in BASE_PARAMETERS.messages {
+            messages.append(message)
+        }
+        print(messages)
+        return messages
+    }
     
     func sendRequest(message: String, completion: @escaping (Result<String, Error>) -> Void) {
         // URL 설정 (실제 서버 엔드포인트로 변경 필요)
@@ -41,10 +58,13 @@ class ConverstaionViewModel: ObservableObject {
             return
         }
         self.setMessage(message: message)
+        
+        let allTheMessage = self.incluedeStoredCard()
+        
         // 페이로드 생성
         let payload = ChatRequestModel(
             model: self.BASE_PARAMETERS.model,
-            messages: self.BASE_PARAMETERS.messages,
+            messages: allTheMessage,
             member_id: self.BASE_PARAMETERS.member_id
         )
         
@@ -58,7 +78,7 @@ class ConverstaionViewModel: ObservableObject {
             switch response.result {
             case .success(let chat):
                 self.chatList?["gpt\(self.chatIdx)"] = chat.content
-                UserDefaultsManager.shared.saveUserChat(message: self.chatList?["user\(self.chatIdx)"] ?? "")
+                UserDefaultsManager.shared.saveUserChat(message: message)
                 UserDefaultsManager.shared.saveGptChats(message: chat.content)
                 completion(.success(chat.content))
             case .failure(let error):
