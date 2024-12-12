@@ -12,7 +12,7 @@ struct CardRegisterView: View {
     @State private var isChatted: Bool = false
     @State private var isSubmitted: Bool = false
     @State private var moveToCamera: Bool = false
-    
+    @Environment(\.dismiss) private var dismiss
     var body: some View {
         ScrollView {
             if !isSubmitted {
@@ -67,6 +67,7 @@ struct CardRegisterView: View {
                     Button {
                         UserDefaultsManager.shared.saveCompanyHashTags(messages: hashTag)
                         isSubmitted.toggle()
+                        dismiss()
                     } label: {
                         RoundedRectangle(cornerRadius: 12)
                             .overlay(content: {

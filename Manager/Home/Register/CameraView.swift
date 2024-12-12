@@ -33,12 +33,12 @@ struct CameraView: View {
                     Button(action: {
                         self.isPresented = false
                     }, label: {
-                        Image(systemName: "xmark.app.fill")
+                        Image(systemName: "xmark.app")
                             .foregroundColor(.white)
                     })
                     .padding(.horizontal, 30)
                 }
-                .font(.system(size:25))
+                .font(.system(size:30))
                 .padding()
                 
                 Spacer()
