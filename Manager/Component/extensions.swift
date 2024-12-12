@@ -23,4 +23,18 @@ extension View {
             .padding(.horizontal, 5)
             .overlay(Capsule().stroke(borderColor))
     }
+    func customFont(size: CGFloat) -> some View {
+            self.modifier(CustomFontModifier(size: size))
+        }
+}
+
+
+struct CustomFontModifier: ViewModifier {
+    let fontName: String = "ChangwonDangamAsac-Bold_0712"
+    let size: CGFloat
+    
+    func body(content: Content) -> some View {
+        content
+            .font(.custom(fontName, size: size)) // 지정한 커스텀 폰트 사용
+    }
 }
