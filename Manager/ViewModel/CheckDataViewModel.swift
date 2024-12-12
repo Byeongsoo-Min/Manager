@@ -18,9 +18,14 @@ struct Card: Codable {
 
 class CheckDataViewModel: ObservableObject {
     @Published var cardList: [Card]?
+    @Published var cachedList: [UserDefaultsManager.CompanyInfo]?
     @Published var nameSort = SortBy.nameASC
     @Published var ratingSort = SortBy.ratingASC
     var BASE_URL = APIClient.BASE_URL
+    
+    func refreshCards() {
+        cachedList = UserDefaultsManager.shared.getAllCardsInfos()
+    }
     
     func updateList(tempList: [Card]) {
         self.cardList = tempList
