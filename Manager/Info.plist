@@ -5,6 +5,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>ChangwonDangamAsac-Bold_0712.otf</string>
+		<string>ChangwonDangamAsac-Bold.otf</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

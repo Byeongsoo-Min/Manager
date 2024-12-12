@@ -29,7 +29,7 @@ struct TabBarView: View {
                 } }.tag(2)
         })
         .fontWeight(.bold)
-        .accentColor(.pink)
+        .accentColor(Color("playgroundColor"))
         .navigationBarBackButtonHidden()
     }
 }

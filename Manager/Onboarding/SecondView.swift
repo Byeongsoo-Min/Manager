@@ -29,12 +29,6 @@ struct SecondView: View {
                     .fontWeight(.semibold)
                 Spacer()
             }.padding(.horizontal)
-            HStack {
-                Text("매니절")
-                    .font(.largeTitle)
-                    .padding(.bottom, 50)
-                Spacer()
-            }.padding(.horizontal)
             Image("manager")
                 .resizable()
                 .aspectRatio(contentMode: .fit)

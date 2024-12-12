@@ -30,7 +30,7 @@ extension View {
 
 
 struct CustomFontModifier: ViewModifier {
-    let fontName: String = "ChangwonDangamAsac-Bold_0712"
+    let fontName: String = "CWDangamAsac-Bold"
     let size: CGFloat
     
     func body(content: Content) -> some View {

@@ -60,7 +60,7 @@ struct HomeView: View {
                     VStack(spacing: 31) {
                         HStack{
                             Text("매니절")
-                                .font(.largeTitle)
+                                .customFont(size: 40)
                                 .fontWeight(.bold)
                                 .foregroundColor(Color("playgroundColor"))
                             Spacer()

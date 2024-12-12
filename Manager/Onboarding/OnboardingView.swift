@@ -17,7 +17,7 @@ struct OnboardingView: View {
             VStack(spacing: 24) {
                 HStack {
                     Text("매니절")
-                        .font(.largeTitle)
+                        .customFont(size: 40)
                         .fontWeight(.bold)
                         .foregroundColor(Color("playgroundColor"))
                     Spacer()
