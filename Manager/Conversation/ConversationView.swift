@@ -13,7 +13,9 @@ struct ConversationView: View {
     @State var chatList = [1 : "오늘도 좋은 하루에요! 저번에 저장한 KAI에 대해 알아보는건 어때요?"] // 1 , 11,  111, 2, 22, 222
     @State private var ownerChat: String = ""
     @State private var isChatted: Bool = false
-    @State private var idx = 1
+    
+    @State private var userIdx = 2
+    @State private var gptIdx = 11
     @StateObject var ConvViewModel = ConverstaionViewModel()
     var body: some View {
         ScrollView {
@@ -73,22 +75,29 @@ struct ConversationView: View {
             .padding(24)
         }
         .onAppear(perform: {
-            let chats = self.ConvViewModel.chatList
-            for (_, chat) in chats! {
-                self.chatList[self.idx] = chat
-                self.idx += 1
+            let chats = ConvViewModel.chatList ?? [:]
+            print(chats)
+            for key in chats.keys.sorted() {
+                if let chat = chats[key] {
+                    if key[key.startIndex] == "u" {
+                        self.chatList[self.userIdx] = chat
+                        self.userIdx = self.userIdx * 10 + 2
+                    } else {
+                        self.chatList[self.gptIdx] = chat
+                        self.gptIdx = self.gptIdx * 10 + 1
+                    }
+                }
             }
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>IDX<<<<<<<<<<<<<",self.idx)
         })
     }
     func pushToChatGPTAPI(chat: String) async -> Void {
-        self.idx += 1
-        self.chatList[self.idx] = chat
+        self.userIdx *= 10 + 2
+        self.chatList[userIdx] = chat
         self.ConvViewModel.sendRequest(message: chat, completion: { result in
             switch result {
             case .success(let content):
-                self.idx += 1
-                self.chatList[self.idx] = content
+                self.gptIdx *= 10 + 1
+                self.chatList[self.gptIdx] = content
             case .failure(let error):
                 print("Error:", error.localizedDescription)
             }
