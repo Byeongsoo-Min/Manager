@@ -10,10 +10,15 @@ import SwiftUI
 struct CheckDataView: View {
     @State private var toggleCard: Bool = false
     @State private var togglePamplete: Bool = false
+    @State private var isShowing: Bool = false
     
     @State var sort = sortedTool.newest
     @StateObject var networking = CheckDataViewModel()
-    private var dummyData = ["경희대학교", "한국항공산업", "카카오 엔터테인먼트", "한화 에어로 스페이스"]
+    
+    @State var cardImage = Image("exampleCard")
+    @State var cardInfos: [String] = ["",""]
+    @State var hashTags: [String] = []
+    
     var body: some View {
         VStack {
             HStack{
@@ -61,11 +66,21 @@ struct CheckDataView: View {
             Divider().padding(.top)
             ScrollView {
                 VStack {
-                    ForEach(networking.cardList ?? [], id: \.cardId) { card in
-                        dataListCellView(card: card)
+                    ForEach(networking.cachedList ?? [], id: \.companyNameNum) { info in
+                        dataListCellView(info: info)
+                            .onTapGesture {
+                                self.cardImage = Image(uiImage: info.image)
+                                self.cardInfos = info.companyNameNum
+                                self.hashTags = info.companyHashTag
+                                print(self.cardInfos)
+                                self.isShowing = true
+                            }
+                        Divider().frame(height: 10)
                     }
-                    if let _ = networking.cardList {
+                   
+                    if let _ = networking.cachedList {
                         
+
                     } else {
                         Text("카드를 등록해주세요!")
                             .font(.largeTitle)
@@ -77,8 +92,13 @@ struct CheckDataView: View {
             }
             Spacer()
             
-        }.onAppear(perform: {
+        }
+        .fullScreenCover(isPresented: $isShowing, content: {
+            ConfirmDataView(cardImage: self.$cardImage, cardInfos: self.$cardInfos, hashTags: self.$hashTags, isPresented: $isShowing)
+        })
+        .onAppear(perform: {
             networking.alamofireNetworking()
+            networking.refreshCards()
         })
     }
 }
