@@ -49,56 +49,61 @@ struct HomeView: View {
                                                 .font(.title2)
                                                 .fontWeight(.semibold)
                                         )
-                                }
+                                }.navigationBarBackButtonHidden()
                                 .frame(height: 56)
                                 .padding()
-
+                                
                             }
                         )
                 }
-                    GeometryReader { proxy in
-                        VStack(spacing: 31) {
-                            HStack{
-                                Text("매니절")
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Color("playgroundColor"))
-                                Spacer()
-                            }.padding(.horizontal)
-                            Pager(page: self.page2,
-                                  data: self.data,
-                                  id: \.self) { pageNumber in
-                                self.pageView(pageNumber)
-                                    .onTapGesture {
-                                        observable.pageNumber = pageNumber
-                                        observable.onTouchAction()
-                                        isShowing = observable.moveToPage ?? true
+                GeometryReader { proxy in
+                    VStack(spacing: 31) {
+                        HStack{
+                            Text("매니절")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(Color("playgroundColor"))
+                            Spacer()
+                        }.padding(.horizontal)
+                        Pager(page: self.page2,
+                              data: self.data,
+                              id: \.self) { pageNumber in
+                            self.pageView(pageNumber)
+                                .onTapGesture {
+                                    observable.pageNumber = pageNumber
+                                    observable.onTouchAction()
+                                    if let images = observable.cardsList {
+                                        if images.indices.contains(pageNumber){
+                                            isShowing = observable.moveToPage ?? true
+                                        }
                                     }
-                            }
-                                  .itemSpacing(10)
-                                  .loopPages(true)
-                                  .horizontal(.startToEnd)
-                                  .interactive(scale: 0.8)
-                                  .itemAspectRatio(0.7)
-                                  .background(.white)
-                                  .frame(height: 400)
-                            
-                            Pager(page: self.page2,
-                                  data: self.data,
-                                  id: \.self) {
-                                self.pageView2($0)
-                            }.itemSpacing(100)
-                                .loopPages(true)
-                                .horizontal(.startToEnd)
-                                .interactive(scale: 0.6)
-                                .itemAspectRatio(0.4)
-                                .frame(height: 120)
+                                    
+                                }
                         }
+                              .itemSpacing(10)
+                              .loopPages(true)
+                              .horizontal(.startToEnd)
+                              .interactive(scale: 0.8)
+                              .itemAspectRatio(0.7)
+                              .background(.white)
+                              .frame(height: 400)
+                        
+                        Pager(page: self.page2,
+                              data: self.data,
+                              id: \.self) {
+                            self.pageView2($0)
+                        }.itemSpacing(100)
+                            .loopPages(true)
+                            .horizontal(.startToEnd)
+                            .interactive(scale: 0.6)
+                            .itemAspectRatio(0.4)
+                            .frame(height: 120)
                     }
-                    NavigationLink(destination: ExistDataView(observable: observable), isActive: $isShowing) {
-                        Text("")
-                    }.padding()
-                    
+                }
+                NavigationLink(destination: ExistDataView(observable: observable), isActive: $isShowing) {
+                    Text("")
+                }.padding()
+                
             }
         }
         .navigationBarBackButtonHidden()
