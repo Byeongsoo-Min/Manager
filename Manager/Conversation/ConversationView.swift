@@ -10,7 +10,9 @@ import SwiftUI
 struct ConversationView: View {
     //MARK: 딕셔너리 사용하되, index를 집어넣어 key값을 바꾸도록 한 방법대로 진행. foreach 어떻게 돌리지 그럼? 아래 로직 처럼 user\(idx) -> 1, 11, 111 로 변경 하고 돌리기 해야하나?? 생각 해봐야할듯
     var managerName = "매니절"
-    @State var chatList = [1 : "오늘도 좋은 하루에요! 저번에 저장한 KAI에 대해 알아보는건 어때요?"] // 1 , 11,  111, 2, 22, 222
+    let date = Date()
+    let dateFormatter = DateFormatter()
+    @State var chatList = [1 : "오늘도 좋은 하루에요! 현재 시간은 "] // 1 , 11,  111, 2, 22, 222
     @State private var ownerChat: String = ""
     @State private var isChatted: Bool = false
     
@@ -23,6 +25,7 @@ struct ConversationView: View {
                 ForEach(chatList.sorted(by: <), id: \.key) { key, _ in
                     if key % 2 == 1 { // chatGPT
                         Text(managerName)
+                            .customFont(size: 20)
                             .foregroundStyle(Color("playgroundColor"))
                         Text(chatList[key] ?? "")
                             .foregroundStyle(.black)
@@ -75,6 +78,7 @@ struct ConversationView: View {
             .padding(24)
         }
         .onAppear(perform: {
+            self.chatList[1]?.append(calcDate(addedDate: date) + "이에요!")
             let chats = ConvViewModel.chatList ?? [:]
             print(chats)
             for key in chats.keys.sorted() {
@@ -104,6 +108,12 @@ struct ConversationView: View {
             
         })
         print("do something")
+    }
+    func calcDate(addedDate: Date) -> String{ // 백엔드에서 받아오는 날짜로 대신
+        dateFormatter.dateFormat = "hh시 mm분"
+        let formattedDate = dateFormatter.string(from: addedDate)
+        
+        return formattedDate
     }
 }
 
