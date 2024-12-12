@@ -85,6 +85,7 @@ struct CardRegisterView: View {
         }.fullScreenCover(isPresented: $moveToCamera, content: {
             CameraView(isPresented: $moveToCamera)
         })
+        .navigationBarBackButtonHidden(isSubmitted ? true : false)
     }
 }
 
