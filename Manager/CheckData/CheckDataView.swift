@@ -78,7 +78,7 @@ struct CheckDataView: View {
                         Divider().frame(height: 10)
                     }
                    
-                    if let _ = networking.cachedList {
+                    if let _ = networking.cardList {
                         
 
                     } else {
@@ -99,6 +99,7 @@ struct CheckDataView: View {
         .onAppear(perform: {
             networking.alamofireNetworking()
             networking.refreshCards()
+            print(networking.cachedList)
         })
     }
 }
