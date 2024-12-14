@@ -75,14 +75,6 @@ struct SecondView: View {
         }
         .padding()
         .navigationBarBackButtonHidden(true)
-        .onAppear(perform: {
-            for family in UIFont.familyNames {
-                print("Font family: \(family)")
-                for name in UIFont.fontNames(forFamilyName: family) {
-                    print("Font name: \(name)")
-                }
-            }
-        })
     }
 }
 
