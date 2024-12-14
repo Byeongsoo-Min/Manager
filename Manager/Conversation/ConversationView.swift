@@ -78,7 +78,7 @@ struct ConversationView: View {
             .padding(24)
         }
         .onAppear(perform: {
-            self.chatList[1]?.append(calcDate(addedDate: date) + "이에요!")
+            self.chatList[1] = "오늘도 좋은 하루에요! 현재 시간은 \(calcDate(addedDate: date)) 이에요!"
             let chats = ConvViewModel.chatList ?? [:]
             print(chats)
             for key in chats.keys.sorted() {
